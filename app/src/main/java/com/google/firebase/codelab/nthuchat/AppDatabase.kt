@@ -8,13 +8,15 @@ import android.content.Context
 @Database(entities = arrayOf(User::class), version = 1, exportSchema = false)
 abstract class AppDatabase : RoomDatabase() {
 
+    private var INSTANCE: AppDatabase? = null
+
     abstract fun userDao(): UserDao
 
     companion object {
 
         private var INSTANCE: AppDatabase? = null
 
-        fun getAppDatabase(context: Context): AppDatabase {
+        fun getAppDatabase(context: Context): AppDatabase? {
             if (INSTANCE == null) {
                 INSTANCE = Room.databaseBuilder(context.applicationContext, AppDatabase::class.java, "user-database")
                         // allow queries on the main thread.

@@ -10,7 +10,7 @@ import com.google.firebase.database.Query
 class User {
 
     @PrimaryKey(autoGenerate = true)
-    var uid: Int = 0
+    var uid: Int? = null
 
     @ColumnInfo(name = "div")
     var Div: String? = null
@@ -18,11 +18,11 @@ class User {
     @ColumnInfo(name = "classes")
     var Classes: String? = null
 
-    fun getUid(): Int {
+    fun getUid(): Int? {
         return uid
     }
 
-    fun setUid(uid: Int) {
+    fun setUid(uid: Int?) {
         this.uid = uid
     }
 

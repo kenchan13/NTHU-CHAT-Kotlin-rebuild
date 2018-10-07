@@ -6,9 +6,10 @@ apply plugin: 'kotlin-android-extensions'
 
 android {
     compileSdkVersion 27
+    buildToolsVersion '28.0.2'
     defaultConfig {
-        applicationId "com.google.firebase.codelab.nthuchat"
-        minSdkVersion 23
+        applicationId "com.nthuchat.demo"
+        minSdkVersion 21
         targetSdkVersion 27
         versionCode 1
         versionName "1.0"
@@ -78,3 +79,5 @@ dependencies {
     annotationProcessor "android.arch.persistence.room:compiler:1.1.1"
     implementation 'org.jsoup:jsoup:1.9.2'
 }
+
+apply plugin: 'com.google.gms.google-services'

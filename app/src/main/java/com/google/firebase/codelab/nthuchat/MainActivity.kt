@@ -57,46 +57,46 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     // Firebase instance variables
     private var mFirebaseAuth: FirebaseAuth? = null
     private var mFirebaseUser: FirebaseUser? = null
-    private val mFirebaseRemoteConfig: FirebaseRemoteConfig? = null
-    private val mFirebaseAnalytics: FirebaseAnalytics? = null
-    private val mAdView: AdView? = null
+    //private val mFirebaseRemoteConfig: FirebaseRemoteConfig? = null  //WTF
+    //private val mFirebaseAnalytics: FirebaseAnalytics? = null  //WTF
+    //private val mAdView: AdView? = null  //WTF
     var mUsername: String? = null
     var mPhotoUrl: String? = null
     var mUid: String? = null
-    private var mNameView: TextView? = null
-    private var mEmailView: TextView? = null
-    private var mIconView: ImageView? = null
+    lateinit private var mNameView: TextView
+    //private var mEmailView: TextView? = null
+    //private var mIconView: ImageView? = null
     var navigationView: NavigationView? = null
     var drawer: DrawerLayout? = null
-    private var headerView: View? = null
-    var fab: FloatingActionButton? = null
-    var currentFragment: Fragment? = null
-    private val mFirebaseDB: FirebaseDatabase? = null
-    private val mFBdiv: DatabaseReference? = null
+    //private var headerView: View? = null
+    //var fab: FloatingActionButton? = null  //WTF
+    lateinit var currentFragment: Fragment
+    //private val mFirebaseDB: FirebaseDatabase? = null  //WTF
+    //private val mFBdiv: DatabaseReference? = null  //WTF
     var dbinstance: AppDatabase? = null
     var user: User? = null
     var sub1: Menu? = null
 
-    override fun onCreate(savedInstanceState: Bundle?) {
+    protected fun onCreate(savedInstanceState: Bundle) {
         super.onCreate(savedInstanceState)
         //Stetho.initializeWithDefaults(this);
         setContentView(R.layout.activity_main)
         navigationView = findViewById(R.id.nav_view)
-        headerView = navigationView.getHeaderView(0)
+        var headerView: View = navigationView.getHeaderView(0)
         mNameView = headerView!!.findViewById(R.id.nameView)
-        mEmailView = headerView!!.findViewById(R.id.emailView)
-        mIconView = headerView!!.findViewById(R.id.iconView)
+        var mEmailView: TextView = headerView!!.findViewById(R.id.emailView)
+        var mIconView: ImageView = headerView!!.findViewById(R.id.iconView)
 
-        val toolbar = findViewById(R.id.toolbar)
+        val toolbar = findViewById<Toolbar>(R.id.toolbar)
         setSupportActionBar(toolbar)
 
-        dbinstance = AppDatabase.getAppDatabase(applicationContext)
+        dbinstance = AppDatabase?.getAppDatabase(getApplicationContext())
         user = dbinstance.userDao().getUser()
 
         drawer = findViewById(R.id.drawer_layout)
         val toggle = object : ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close) {
-            override fun onDrawerSlide(drawerView: View?, slideOffset: Float) {
+            fun onDrawerSlide(drawerView: View, slideOffset: Float) {
                 if (slideOffset != 0f) {
                     hideKeyboard(this@MainActivity)
                 }
@@ -106,23 +106,23 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         toggle.syncState()
 
         mFirebaseAuth = FirebaseAuth.getInstance()
-        mFirebaseUser = mFirebaseAuth!!.currentUser
+        mFirebaseUser = mFirebaseAuth!!.getCurrentUser()
         if (mFirebaseUser == null) {
             // Not signed in, launch the Sign In activity
             startActivity(Intent(this, SignInActivity::class.java))
             finish()
             return
         } else {
-            if (mFirebaseUser!!.photoUrl != null) {
-                mPhotoUrl = mFirebaseUser!!.photoUrl!!.toString()
-                mUsername = mFirebaseUser!!.displayName
-                mUid = mFirebaseUser!!.uid
+            if (mFirebaseUser!!.getPhotoUrl() != null) {
+                mPhotoUrl = mFirebaseUser!!.getPhotoUrl().toString()
+                mUsername = mFirebaseUser!!.getDisplayName()
+                mUid = mFirebaseUser!!.getUid()
                 if (mPhotoUrl != null && mPhotoUrl!!.contains("..")) {
                     mPhotoUrl = "https://nthuchat.com" + mPhotoUrl!!.replace("..", "")
                 }
                 //Toast.makeText(this, "name:  "+mPhotoUrl, Toast.LENGTH_SHORT).show();
-                mNameView!!.text = mUsername
-                mEmailView!!.text = mFirebaseUser!!.email
+                mNameView!!.setText(mUsername)
+                mEmailView!!.setText(mFirebaseUser!!.getEmail())
                 Picasso.with(this@MainActivity).load(mPhotoUrl).transform(CropCircleTransformation()).into(mIconView)
                 //mIconView.setImageURI(Uri.parse(mPhotoUrl));
             } else {
@@ -133,30 +133,32 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                         .setDisplayName(namelist[namenum])
                         .setPhotoUri(Uri.parse("../images/user$picnum.jpg")).build()
                 mFirebaseUser!!.updateProfile(profileUpdate)
-                        .addOnCompleteListener { task ->
-                            if (task.isSuccessful) {
-                                mUsername = mFirebaseUser!!.displayName
-                                mUid = mFirebaseUser!!.uid
-                                mPhotoUrl = mFirebaseUser!!.photoUrl!!.toString()
-                                mNameView!!.text = mUsername
-                                mEmailView!!.text = mFirebaseUser!!.email
-                                if (mPhotoUrl != null && mPhotoUrl!!.contains("..")) {
-                                    mPhotoUrl = "https://nthuchat.com" + mPhotoUrl!!.replace("..", "")
+                        .addOnCompleteListener(object : OnCompleteListener<Void>() {
+                            fun onComplete(@NonNull task: Task<Void>) {
+                                if (task.isSuccessful()) {
+                                    mUsername = mFirebaseUser!!.getDisplayName()
+                                    mUid = mFirebaseUser!!.getUid()
+                                    mPhotoUrl = mFirebaseUser!!.getPhotoUrl().toString()
+                                    mNameView!!.setText(mUsername)
+                                    mEmailView!!.setText(mFirebaseUser!!.getEmail())
+                                    if (mPhotoUrl != null && mPhotoUrl!!.contains("..")) {
+                                        mPhotoUrl = "https://nthuchat.com" + mPhotoUrl!!.replace("..", "")
+                                    }
+                                    Picasso.with(this@MainActivity).load(mPhotoUrl).transform(CropCircleTransformation()).into(mIconView)
                                 }
-                                Picasso.with(this@MainActivity).load(mPhotoUrl).transform(CropCircleTransformation()).into(mIconView)
                             }
-                        }
+                        })
             }
 
         }
 
         if (user != null) {
-            navigationView.menu.findItem(R.id.div).setTitle(user!!.getDiv())
+            navigationView.getMenu().findItem(R.id.div).setTitle(user!!.getDiv())
             val coursename = user!!.getClasses()
             val course_title = coursename.split("#".toRegex()).dropLastWhile({ it.isEmpty() }).toTypedArray()
             //Toast.makeText(this, "course.length: "+course_title.length, Toast.LENGTH_SHORT).show();
             if (course_title.size > 1) {
-                sub1 = navigationView.menu.addSubMenu(R.id.course_menu, 49, 49, R.string.courses)
+                sub1 = navigationView.getMenu().addSubMenu(R.id.course_menu, 49, 49, R.string.courses)
                 for (id in 0..course_title.size - 1) {
                     //Toast.makeText(MainActivity.this, course_title[id], Toast.LENGTH_SHORT).show();
                     sub1.add(0, 50 + id, 50 + id, course_title[id]).setIcon(R.drawable.ic_assignment_black_18dp)
@@ -172,7 +174,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     }
 
 
-    override fun onBackPressed() {
+    fun onBackPressed() {
         drawer = findViewById(R.id.drawer_layout)
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START)
@@ -181,22 +183,22 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         }
     }
 
-    public override fun onResume() {
+    fun onResume() {
         super.onResume()
         //getSupportFragmentManager().beginTransaction().add(R.id.content_frame, currentFragment).commit();
     }
 
-    override fun onCreateOptionsMenu(menu: Menu): Boolean {
+    fun onCreateOptionsMenu(menu: Menu): Boolean {
         // Inflate the menu; this adds items to the action bar if it is present.
-        menuInflater.inflate(R.menu.main, menu)
+        getMenuInflater().inflate(R.menu.main, menu)
         return true
     }
 
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+    fun onOptionsItemSelected(item: MenuItem): Boolean {
         // Handle action bar item clicks here. The action bar will
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
-        when (item.itemId) {
+        when (item.getItemId()) {
             R.id.action_settings -> {
                 val uri = Uri.parse("https://www.facebook.com/nthuchat/")
                 val it = Intent(Intent.ACTION_VIEW, uri)
@@ -211,9 +213,9 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     }
 
 
-    override fun onNavigationItemSelected(item: MenuItem): Boolean {
+    fun onNavigationItemSelected(@NonNull item: MenuItem): Boolean {
         // Handle navigation view item clicks here.
-        val id = item.itemId
+        val id = item.getItemId()
         when (id) {
             R.id.school -> displaySelectedScreen(R.id.school)
             R.id.div -> displaySelectedScreen(R.id.div)
@@ -222,47 +224,55 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 val intro = getString(R.string.change_name_intro)
                 val confirm = getString(R.string.confirm)
                 val cancel = getString(R.string.cancel)
-                val lastname = mFirebaseUser!!.displayName
+                val lastname = mFirebaseUser!!.getDisplayName()
 
                 val alertdialog = AlertDialog.Builder(this@MainActivity)
                 val editText = EditText(this@MainActivity)
                 val container = FrameLayout(this@MainActivity)
                 val params = FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
 
-                params.leftMargin = resources.getDimensionPixelSize(R.dimen.dialog_margin)
-                params.rightMargin = resources.getDimensionPixelSize(R.dimen.dialog_margin)
-                editText.layoutParams = params
-                editText.hint = lastname
-                editText.maxLines = 1
+                params.leftMargin = getResources().getDimensionPixelSize(R.dimen.dialog_margin)
+                params.rightMargin = getResources().getDimensionPixelSize(R.dimen.dialog_margin)
+                editText.setLayoutParams(params)
+                editText.setHint(lastname)
+                editText.setMaxLines(1)
                 editText.setSingleLine()
-                editText.filters = arrayOf<InputFilter>(InputFilter.LengthFilter(20))
+                editText.setFilters(arrayOf<InputFilter>(InputFilter.LengthFilter(20)))
                 container.addView(editText)
 
                 alertdialog.setTitle(title)//設定視窗標題
                         .setIcon(R.mipmap.ic_launcher)//設定對話視窗圖示
                         .setMessage(intro)//設定顯示的文字
                         .setView(container)
-                        .setNegativeButton(cancel) { dialog, which -> Toast.makeText(this@MainActivity, "Canceled Change Name", Toast.LENGTH_SHORT).show() }//設定結束的子視窗
-                        .setPositiveButton(confirm) { dialog, which ->
-                            val changename = editText.text.toString()
-                            if (changename.contains(" ")) {
-                                changename.replace(" ".toRegex(), "")
+                        .setNegativeButton(cancel, object : DialogInterface.OnClickListener() {
+                            fun onClick(dialog: DialogInterface, which: Int) {
+                                Toast.makeText(this@MainActivity, "Canceled Change Name", Toast.LENGTH_SHORT).show()
                             }
-                            if (changename.trim { it <= ' ' }.length > 0) {
-                                val profileUpdate = UserProfileChangeRequest.Builder()
-                                        .setDisplayName(changename).build()
-                                mFirebaseUser!!.updateProfile(profileUpdate)
-                                        .addOnCompleteListener { task ->
-                                            if (task.isSuccessful) {
-                                                mUsername = mFirebaseUser!!.displayName
-                                                mUid = mFirebaseUser!!.uid
-                                                mPhotoUrl = mFirebaseUser!!.photoUrl!!.toString()
-                                                Toast.makeText(this@MainActivity, "Now your name: " + mUsername!!, Toast.LENGTH_SHORT).show()
-                                                mNameView!!.text = mUsername
-                                            }
-                                        }
+                        })//設定結束的子視窗
+                        .setPositiveButton(confirm, object : DialogInterface.OnClickListener() {
+                            fun onClick(dialog: DialogInterface, which: Int) {
+                                val changename = editText.getText().toString()
+                                if (changename.contains(" ")) {
+                                    changename.replace(" ".toRegex(), "")
+                                }
+                                if (changename.trim({ it <= ' ' }).length > 0) {
+                                    val profileUpdate = UserProfileChangeRequest.Builder()
+                                            .setDisplayName(changename).build()
+                                    mFirebaseUser!!.updateProfile(profileUpdate)
+                                            .addOnCompleteListener(object : OnCompleteListener<Void>() {
+                                                fun onComplete(@NonNull task: Task<Void>) {
+                                                    if (task.isSuccessful()) {
+                                                        mUsername = mFirebaseUser!!.getDisplayName()
+                                                        mUid = mFirebaseUser!!.getUid()
+                                                        mPhotoUrl = mFirebaseUser!!.getPhotoUrl().toString()
+                                                        Toast.makeText(this@MainActivity, "Now your name: $mUsername", Toast.LENGTH_SHORT).show()
+                                                        mNameView!!.setText(mUsername)
+                                                    }
+                                                }
+                                            })
+                                }
                             }
-                        }//設定結束的子視窗
+                        })//設定結束的子視窗
                         .show()
             }
             R.id.sign_out_menu -> {
@@ -308,7 +318,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         //replacing the fragment
         if (fragment != null) {
             hideKeyboard(this)
-            val ft = supportFragmentManager.beginTransaction()
+            val ft = getSupportFragmentManager().beginTransaction()
             ft.setCustomAnimations(R.anim.slide_in, R.anim.slide_out)
             ft.replace(R.id.content_frame, fragment)
             ft.commit()
@@ -318,12 +328,12 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         drawer.closeDrawer(GravityCompat.START)
     }
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent) {
+    protected fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent) {
         super.onActivityResult(requestCode, resultCode, data)
         Log.d(TAG, "onActivityResult: requestCode=$requestCode, resultCode=$resultCode")
     }
 
-    override fun onConnectionFailed(connectionResult: ConnectionResult) {
+    fun onConnectionFailed(@NonNull connectionResult: ConnectionResult) {
         // An unresolvable error has occurred and Google APIs (including Sign-In) will not
         // be available.
         Log.d(TAG, "onConnectionFailed:$connectionResult")
@@ -336,12 +346,12 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         fun hideKeyboard(activity: Activity) {
             val imm = activity.getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
             //Find the currently focused view, so we can grab the correct window token from it.
-            var view = activity.currentFocus
+            var view = activity.getCurrentFocus()
             //If no view currently has focus, create a new one, just so we can grab a window token from it
             if (view == null) {
                 view = View(activity)
             }
-            imm.hideSoftInputFromWindow(view.windowToken, 0)
+            imm.hideSoftInputFromWindow(view!!.getWindowToken(), 0)
         }
     }
 }

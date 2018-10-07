@@ -9,11 +9,11 @@ import android.arch.persistence.room.Update
 @Dao
 interface UserDao {
 
-    @get:Query("SELECT * FROM user")
-    val all: List<User>
+    @Query("SELECT * FROM user")
+    fun getAll(): List<User>
 
-    @get:Query("SELECT * FROM user")
-    val user: User
+    @Query("SELECT * FROM user")
+    fun getUser(): User
 
     @Query("SELECT * FROM user where div LIKE :div AND classes LIKE :classes")
     fun findByName(div: String, classes: String): User
