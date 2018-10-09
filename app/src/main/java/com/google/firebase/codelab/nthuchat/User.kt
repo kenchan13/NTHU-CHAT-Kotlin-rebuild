@@ -18,27 +18,15 @@ class User {
     @ColumnInfo(name = "classes")
     var Classes: String? = null
 
-    fun getUid(): Int? {
-        return uid
-    }
+    fun getUid(): Int? { return uid }
 
-    fun setUid(uid: Int?) {
-        this.uid = uid
-    }
+    fun setUid(uid: Int) { this.uid = uid }
 
-    fun getDiv(): String? {
-        return Div
-    }
+    fun getDiv(): String? { return Div }
 
-    fun setDiv(div: String?) {
-        this.Div = div
-    }
+    fun setDiv(div: String) { this.Div = div }
 
-    fun getClasses(): String? {
-        return Classes
-    }
+    fun getClasses(): String? { return Classes }
 
-    fun setClasses(classes: String?) {
-        this.Classes = classes
-    }
+    fun setClasses(classes: String) { this.Classes = classes }
 }

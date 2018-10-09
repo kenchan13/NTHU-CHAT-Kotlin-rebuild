@@ -12,7 +12,7 @@ object CookieUtils {
 
     /* 返回cookies列表 */
     fun getCookies(): List<Cookie>? {
-        return if (cookies != null) cookies else ArrayList()
+        return if (cookies != null) cookies else ArrayList<Cookie>()
     }
 
     /* 设置cookies列表 */

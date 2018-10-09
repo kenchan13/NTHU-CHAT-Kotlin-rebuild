@@ -7,6 +7,7 @@ import android.content.DialogInterface
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.support.annotation.NonNull
 import android.support.design.widget.FloatingActionButton
 import android.support.design.widget.Snackbar
 import android.support.v4.app.FragmentTransaction
@@ -82,7 +83,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         //Stetho.initializeWithDefaults(this);
         setContentView(R.layout.activity_main)
         navigationView = findViewById(R.id.nav_view)
-        var headerView: View = navigationView.getHeaderView(0)
+        var headerView: View? = navigationView?.getHeaderView(0)
         mNameView = headerView!!.findViewById(R.id.nameView)
         var mEmailView: TextView = headerView!!.findViewById(R.id.emailView)
         var mIconView: ImageView = headerView!!.findViewById(R.id.iconView)
@@ -91,12 +92,13 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         setSupportActionBar(toolbar)
 
         dbinstance = AppDatabase?.getAppDatabase(getApplicationContext())
-        user = dbinstance.userDao().getUser()
+        user = dbinstance!!.userDao().getUser()
 
         drawer = findViewById(R.id.drawer_layout)
         val toggle = object : ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close) {
-            fun onDrawerSlide(drawerView: View, slideOffset: Float) {
+
+            override fun onDrawerSlide(drawerView: View, slideOffset: Float) {
                 if (slideOffset != 0f) {
                     hideKeyboard(this@MainActivity)
                 }
@@ -133,8 +135,8 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                         .setDisplayName(namelist[namenum])
                         .setPhotoUri(Uri.parse("../images/user$picnum.jpg")).build()
                 mFirebaseUser!!.updateProfile(profileUpdate)
-                        .addOnCompleteListener(object : OnCompleteListener<Void>() {
-                            fun onComplete(@NonNull task: Task<Void>) {
+                        .addOnCompleteListener( object : OnCompleteListener<Void>() {
+                             fun onComplete(@NonNull task: Task<Void>) {
                                 if (task.isSuccessful()) {
                                     mUsername = mFirebaseUser!!.getDisplayName()
                                     mUid = mFirebaseUser!!.getUid()
@@ -174,7 +176,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     }
 
 
-    fun onBackPressed() {
+    override fun onBackPressed() {
         drawer = findViewById(R.id.drawer_layout)
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START)
@@ -183,18 +185,18 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         }
     }
 
-    fun onResume() {
+    override fun onResume() {
         super.onResume()
         //getSupportFragmentManager().beginTransaction().add(R.id.content_frame, currentFragment).commit();
     }
 
-    fun onCreateOptionsMenu(menu: Menu): Boolean {
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.main, menu)
         return true
     }
 
-    fun onOptionsItemSelected(item: MenuItem): Boolean {
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
         // Handle action bar item clicks here. The action bar will
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
@@ -213,7 +215,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     }
 
 
-    fun onNavigationItemSelected(@NonNull item: MenuItem): Boolean {
+    override fun onNavigationItemSelected(@NonNull item: MenuItem): Boolean {
         // Handle navigation view item clicks here.
         val id = item.getItemId()
         when (id) {
@@ -245,12 +247,12 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                         .setMessage(intro)//設定顯示的文字
                         .setView(container)
                         .setNegativeButton(cancel, object : DialogInterface.OnClickListener() {
-                            fun onClick(dialog: DialogInterface, which: Int) {
+                            override fun onClick(dialog: DialogInterface, which: Int) {
                                 Toast.makeText(this@MainActivity, "Canceled Change Name", Toast.LENGTH_SHORT).show()
                             }
                         })//設定結束的子視窗
                         .setPositiveButton(confirm, object : DialogInterface.OnClickListener() {
-                            fun onClick(dialog: DialogInterface, which: Int) {
+                            override fun onClick(dialog: DialogInterface, which: Int) {
                                 val changename = editText.getText().toString()
                                 if (changename.contains(" ")) {
                                     changename.replace(" ".toRegex(), "")
@@ -260,7 +262,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                                             .setDisplayName(changename).build()
                                     mFirebaseUser!!.updateProfile(profileUpdate)
                                             .addOnCompleteListener(object : OnCompleteListener<Void>() {
-                                                fun onComplete(@NonNull task: Task<Void>) {
+                                                override fun onComplete(@NonNull task: Task<Void>) {
                                                     if (task.isSuccessful()) {
                                                         mUsername = mFirebaseUser!!.getDisplayName()
                                                         mUid = mFirebaseUser!!.getUid()
@@ -328,12 +330,12 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         drawer.closeDrawer(GravityCompat.START)
     }
 
-    protected fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent) {
+    override protected fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent) {
         super.onActivityResult(requestCode, resultCode, data)
         Log.d(TAG, "onActivityResult: requestCode=$requestCode, resultCode=$resultCode")
     }
 
-    fun onConnectionFailed(@NonNull connectionResult: ConnectionResult) {
+    override fun onConnectionFailed(@NonNull connectionResult: ConnectionResult) {
         // An unresolvable error has occurred and Google APIs (including Sign-In) will not
         // be available.
         Log.d(TAG, "onConnectionFailed:$connectionResult")

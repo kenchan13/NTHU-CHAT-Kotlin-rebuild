@@ -8,8 +8,6 @@ import android.content.Context
 @Database(entities = arrayOf(User::class), version = 1, exportSchema = false)
 abstract class AppDatabase : RoomDatabase() {
 
-    private var INSTANCE: AppDatabase? = null
-
     abstract fun userDao(): UserDao
 
     companion object {

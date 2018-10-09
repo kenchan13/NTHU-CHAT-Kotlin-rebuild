@@ -60,20 +60,26 @@ import java.lang.String.valueOf
 
 class SignInActivity : AppCompatActivity(), GoogleApiClient.OnConnectionFailedListener, View.OnClickListener {
 
-    var finalAsyncHttpClient: FinalAsyncHttpClient? = null
+    companion object {
+
+        private val TAG = "SignInActivity"
+        private val RC_SIGN_IN = 9001
+    }
+
+    //var finalAsyncHttpClient: FinalAsyncHttpClient? = null
     var client: AsyncHttpClient? = null
 
-    private var mSignInButton1: Button? = null
+    //private var mSignInButton1: Button? = null
 
-    private var mGoogleApiClient: GoogleApiClient? = null
-    private var mFirebaseUser: FirebaseUser? = null
+    //private var mGoogleApiClient: GoogleApiClient? = null
+    //private var mFirebaseUser: FirebaseUser? = null
 
     // Firebase instance variables
     private var mFirebaseAuth: FirebaseAuth? = null
     private var mIdView: EditText? = null
     private var mPasswordView: EditText? = null
     private var mFirebaseDB: FirebaseDatabase? = null
-    private var mFBdiv: DatabaseReference? = null
+    //private var mFBdiv: DatabaseReference? = null
     var user: User? = null
     var dbinstance: AppDatabase? = null
     // var fire_div: String? = null
@@ -112,9 +118,9 @@ class SignInActivity : AppCompatActivity(), GoogleApiClient.OnConnectionFailedLi
         setContentView(R.layout.activity_sign_in)
 
         dbinstance = AppDatabase.getAppDatabase(applicationContext)
-        val test = dbinstance!!.userDao().getUser()
-        if (test != null) {
-            dbinstance!!.userDao().delete(test)
+        if (dbinstance?.userDao()?.getUser() != null) {
+            val targetUser: User? = dbinstance?.userDao()?.getUser()
+            dbinstance?.userDao()?.delete(targetUser)
         }
 
         // Assign fields
@@ -122,17 +128,17 @@ class SignInActivity : AppCompatActivity(), GoogleApiClient.OnConnectionFailedLi
         mIdView!!.setHintTextColor(Color.BLACK)
         mPasswordView = findViewById<View>(R.id.Input_pw) as EditText
         mPasswordView!!.setHintTextColor(Color.BLACK)
-        mSignInButton1 = findViewById<View>(R.id.sign_in_button_1) as Button
+        var mSignInButton1: Button = findViewById<View>(R.id.sign_in_button_1) as Button
 
         // Set click listeners
-        mSignInButton1!!.setOnClickListener(this)
+        mSignInButton1.setOnClickListener(this)
 
         // Configure Google Sign In
         val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestIdToken(getString(R.string.default_web_client_id))
                 .requestEmail()
                 .build()
-        mGoogleApiClient = GoogleApiClient.Builder(this)
+        var mGoogleApiClient: GoogleApiClient = GoogleApiClient.Builder(this)
                 .enableAutoManage(this /* FragmentActivity */, this /* OnConnectionFailedListener */)
                 .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
                 .build()
@@ -221,7 +227,7 @@ class SignInActivity : AppCompatActivity(), GoogleApiClient.OnConnectionFailedLi
      */
     fun login(email: String, passwd: String) {
         val params = RequestParams()
-        finalAsyncHttpClient = FinalAsyncHttpClient()
+        var finalAsyncHttpClient: FinalAsyncHttpClient = FinalAsyncHttpClient()
         client = finalAsyncHttpClient?.getAsyncHttpClient()
         CookieUtils.saveCookie(client, this)
         val myCookieStore = PersistentCookieStore(this@SignInActivity)
@@ -258,7 +264,7 @@ class SignInActivity : AppCompatActivity(), GoogleApiClient.OnConnectionFailedLi
                         //Toast.makeText(SignInActivity.this, "Login Access, cookie=" + getCookieText(), Toast.LENGTH_SHORT).show();
                         CookieUtils.setCookies(CookieUtils.getCookie(this@SignInActivity))
                         if (mFirebaseAuth!!.currentUser != null) {
-                            mFirebaseUser = mFirebaseAuth!!.currentUser
+                            var mFirebaseUser: FirebaseUser? = mFirebaseAuth!!.currentUser
                             //Toast.makeText(SignInActivity.this, "[login.auth]=" +mFirebaseAuth, Toast.LENGTH_SHORT).show();
                             //Toast.makeText(SignInActivity.this, "[login.user]=" +mFirebaseUser, Toast.LENGTH_SHORT).show();
                             startActivity(Intent(this@SignInActivity, MainActivity::class.java))
@@ -330,10 +336,10 @@ class SignInActivity : AppCompatActivity(), GoogleApiClient.OnConnectionFailedLi
                         user = User()
                         // Sign in success, update UI with the signed-in user's information
                         Log.d(TAG, "signInWithEmail:success")
-                        mFBdiv = mFirebaseDB!!.getReference("/users/" + mFirebaseAuth!!.currentUser!!.uid)
+                        var mFBdiv: DatabaseReference = mFirebaseDB!!.getReference("/users/" + mFirebaseAuth!!.currentUser!!.uid)
                         //Toast.makeText(SignInActivity.this, "Login Firebase Success.", Toast.LENGTH_SHORT).show();
                         val user = User()
-                        mFBdiv!!.child("div").setValue(div)
+                        mFBdiv.child("div").setValue(div)
                         user.setDiv(div)
                         client?.get("http://lms.nthu.edu.tw/home.php", object : AsyncHttpResponseHandler() {
                             override fun onFailure(statusCode: Int, headers: Array<Header>,
@@ -386,9 +392,4 @@ class SignInActivity : AppCompatActivity(), GoogleApiClient.OnConnectionFailedLi
         user.setClasses(title_name)
     }
 
-    companion object {
-
-        private val TAG = "SignInActivity"
-        private val RC_SIGN_IN = 9001
-    }
 }
