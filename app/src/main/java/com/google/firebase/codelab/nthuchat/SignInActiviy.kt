@@ -84,29 +84,6 @@ class SignInActivity : AppCompatActivity(), GoogleApiClient.OnConnectionFailedLi
     var dbinstance: AppDatabase? = null
     // var fire_div: String? = null
 
-    private val cookieText: String
-        get() {
-            val myCookieStore = PersistentCookieStore(this@SignInActivity)
-            val cookies = myCookieStore.cookies
-            Log.d(TAG, "cookies.size() = " + cookies.size)
-            CookieUtils.setCookies(cookies)
-            for (cookie in cookies) {
-                Log.d(TAG, cookie.name + " = " + cookie.value)
-            }
-            val sb = StringBuffer()
-            for (i in cookies.indices) {
-                val cookie = cookies[i]
-                val cookieName = cookie.name
-                val cookieValue = cookie.value
-                if (!TextUtils.isEmpty(cookieName) && !TextUtils.isEmpty(cookieValue)) {
-                    sb.append("$cookieName=")
-                    sb.append("$cookieValue;")
-                }
-            }
-            Log.e("cookie", sb.toString())
-            return sb.toString()
-        }
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         /*if(!TextUtils.isEmpty(getCookieText())){
@@ -153,7 +130,7 @@ class SignInActivity : AppCompatActivity(), GoogleApiClient.OnConnectionFailedLi
     public override fun onStart() {
         super.onStart()
         //Check if user is signed in (non-null) and update UI accordingly.
-        val currentUser = mFirebaseAuth!!.currentUser
+        val currentUser: FirebaseUser? = mFirebaseAuth?.getCurrentUser()
         //Toast.makeText(SignInActivity.this, "[signin.start]currentUser: "+currentUser, Toast.LENGTH_SHORT).show();
     }
 
@@ -213,13 +190,9 @@ class SignInActivity : AppCompatActivity(), GoogleApiClient.OnConnectionFailedLi
         }
     }
 
-    private fun isIdValid(Id: String): Boolean {
-        return Id.length > 5
-    }
+    private fun isIdValid(Id: String): Boolean { return Id.length > 5 }
 
-    private fun isPasswordValid(password: String): Boolean {
-        return password.length > 0
-    }
+    private fun isPasswordValid(password: String): Boolean { return password.length > 0 }
 
     /**
      * Represents an asynchronous login/registration task used to authenticate
@@ -318,6 +291,28 @@ class SignInActivity : AppCompatActivity(), GoogleApiClient.OnConnectionFailedLi
                     }
                 }
         // [END create_user_with_email]
+    }
+
+    private fun getCookieText(): String {
+        val myCookieStore = PersistentCookieStore(this@SignInActivity)
+        val cookies = myCookieStore.cookies
+        Log.d(TAG, "cookies.size() = " + cookies.size)
+        CookieUtils.setCookies(cookies)
+        for (cookie in cookies) {
+            Log.d(TAG, cookie.name + " = " + cookie.value)
+        }
+        val sb = StringBuffer()
+        for (i in cookies.indices) {
+            val cookie = cookies[i]
+            val cookieName = cookie.name
+            val cookieValue = cookie.value
+            if (!TextUtils.isEmpty(cookieName) && !TextUtils.isEmpty(cookieValue)) {
+                sb.append("$cookieName=")
+                sb.append("$cookieValue;")
+            }
+        }
+        Log.e("cookie", sb.toString())
+        return sb.toString()
     }
 
     override fun onClick(v: View) {

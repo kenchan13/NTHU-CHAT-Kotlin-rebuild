@@ -86,13 +86,13 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         var headerView: View? = navigationView?.getHeaderView(0)
         mNameView = headerView!!.findViewById(R.id.nameView)
         var mEmailView: TextView = headerView!!.findViewById(R.id.emailView)
-        var mIconView: ImageView = headerView!!.findViewById(R.id.iconView)
+        var mIconView: ImageView = headerView?.findViewById(R.id.iconView)
 
         val toolbar = findViewById<Toolbar>(R.id.toolbar)
         setSupportActionBar(toolbar)
 
         dbinstance = AppDatabase?.getAppDatabase(getApplicationContext())
-        user = dbinstance!!.userDao().getUser()
+        user = dbinstance?.userDao()?.getUser()
 
         drawer = findViewById(R.id.drawer_layout)
         val toggle = object : ActionBarDrawerToggle(
