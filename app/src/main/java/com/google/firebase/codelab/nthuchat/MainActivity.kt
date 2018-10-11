@@ -104,7 +104,8 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 }
             }
         }
-        drawer.addDrawerListener(toggle)
+
+        drawer?.addDrawerListener(toggle)
         toggle.syncState()
 
         mFirebaseAuth = FirebaseAuth.getInstance()
@@ -134,9 +135,28 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 val profileUpdate = UserProfileChangeRequest.Builder()
                         .setDisplayName(namelist[namenum])
                         .setPhotoUri(Uri.parse("../images/user$picnum.jpg")).build()
+
+//                Original Error Kotlin Code
+//                mFirebaseUser!!.updateProfile(profileUpdate)
+//                        .addOnCompleteListener( object : OnCompleteListener<Void>() {
+//                             fun onComplete(@NonNull task: Task<Void>) {
+//                                if (task.isSuccessful()) {
+//                                    mUsername = mFirebaseUser!!.getDisplayName()
+//                                    mUid = mFirebaseUser!!.getUid()
+//                                    mPhotoUrl = mFirebaseUser!!.getPhotoUrl().toString()
+//                                    mNameView!!.setText(mUsername)
+//                                    mEmailView!!.setText(mFirebaseUser!!.getEmail())
+//                                    if (mPhotoUrl != null && mPhotoUrl!!.contains("..")) {
+//                                        mPhotoUrl = "https://nthuchat.com" + mPhotoUrl!!.replace("..", "")
+//                                    }
+//                                    Picasso.with(this@MainActivity).load(mPhotoUrl).transform(CropCircleTransformation()).into(mIconView)
+//                                }
+//                            }
+//                        })
+
                 mFirebaseUser!!.updateProfile(profileUpdate)
-                        .addOnCompleteListener( object : OnCompleteListener<Void>() {
-                             fun onComplete(@NonNull task: Task<Void>) {
+                        .addOnCompleteListener{ task ->
+                            fun onComplete(@NonNull task: Task<Void>) {
                                 if (task.isSuccessful()) {
                                     mUsername = mFirebaseUser!!.getDisplayName()
                                     mUid = mFirebaseUser!!.getUid()
@@ -149,21 +169,22 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                                     Picasso.with(this@MainActivity).load(mPhotoUrl).transform(CropCircleTransformation()).into(mIconView)
                                 }
                             }
-                        })
+                        }
+
             }
 
         }
 
         if (user != null) {
-            navigationView.getMenu().findItem(R.id.div).setTitle(user!!.getDiv())
+            navigationView?.getMenu()?.findItem(R.id.div)?.setTitle(user!!.getDiv())
             val coursename = user!!.getClasses()
-            val course_title = coursename.split("#".toRegex()).dropLastWhile({ it.isEmpty() }).toTypedArray()
+            val course_title = coursename!!.split("#".toRegex()).dropLastWhile({ it.isEmpty() }).toTypedArray()
             //Toast.makeText(this, "course.length: "+course_title.length, Toast.LENGTH_SHORT).show();
             if (course_title.size > 1) {
-                sub1 = navigationView.getMenu().addSubMenu(R.id.course_menu, 49, 49, R.string.courses)
+                sub1 = navigationView?.getMenu()?.addSubMenu(R.id.course_menu, 49, 49, R.string.courses)
                 for (id in 0..course_title.size - 1) {
                     //Toast.makeText(MainActivity.this, course_title[id], Toast.LENGTH_SHORT).show();
-                    sub1.add(0, 50 + id, 50 + id, course_title[id]).setIcon(R.drawable.ic_assignment_black_18dp)
+                    sub1?.add(0, 50 + id, 50 + id, course_title[id])?.setIcon(R.drawable.ic_assignment_black_18dp)
                 }
             }
         } else {
@@ -171,15 +192,15 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             finish()
             return
         }
-        navigationView.setNavigationItemSelectedListener(this)
+        navigationView?.setNavigationItemSelectedListener(this)
         displaySelectedScreen(R.id.school)
     }
 
 
     override fun onBackPressed() {
         drawer = findViewById(R.id.drawer_layout)
-        if (drawer.isDrawerOpen(GravityCompat.START)) {
-            drawer.closeDrawer(GravityCompat.START)
+        if (drawer?.isDrawerOpen(GravityCompat.START) == true) {
+            drawer?.closeDrawer(GravityCompat.START)
         } else {
             super.onBackPressed()
         }
@@ -246,12 +267,20 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                         .setIcon(R.mipmap.ic_launcher)//設定對話視窗圖示
                         .setMessage(intro)//設定顯示的文字
                         .setView(container)
-                        .setNegativeButton(cancel, object : DialogInterface.OnClickListener() {
-                            override fun onClick(dialog: DialogInterface, which: Int) {
+//                        Original Kotlin Error Codre
+//                        .setNegativeButton(cancel, object : DialogInterface.OnClickListener() {
+//                            override fun onClick(dialog: DialogInterface, which: Int) {
+//                                Toast.makeText(this@MainActivity, "Canceled Change Name", Toast.LENGTH_SHORT).show()
+//                            }
+
+
+                        .setNegativeButton(cancel, object : DialogInterface.OnClickListener {
+                             override fun onClick(dialog: DialogInterface, which: Int) {
                                 Toast.makeText(this@MainActivity, "Canceled Change Name", Toast.LENGTH_SHORT).show()
                             }
+
                         })//設定結束的子視窗
-                        .setPositiveButton(confirm, object : DialogInterface.OnClickListener() {
+                        .setPositiveButton(confirm, object : DialogInterface.OnClickListener {
                             override fun onClick(dialog: DialogInterface, which: Int) {
                                 val changename = editText.getText().toString()
                                 if (changename.contains(" ")) {
@@ -260,9 +289,23 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                                 if (changename.trim({ it <= ' ' }).length > 0) {
                                     val profileUpdate = UserProfileChangeRequest.Builder()
                                             .setDisplayName(changename).build()
+//                                  Original Error Kotlin
+//                                    mFirebaseUser!!.updateProfile(profileUpdate)
+//                                            .addOnCompleteListener(object : OnCompleteListener<Void>() {
+//                                                override fun onComplete(@NonNull task: Task<Void>) {
+//                                                    if (task.isSuccessful()) {
+//                                                        mUsername = mFirebaseUser!!.getDisplayName()
+//                                                        mUid = mFirebaseUser!!.getUid()
+//                                                        mPhotoUrl = mFirebaseUser!!.getPhotoUrl().toString()
+//                                                        Toast.makeText(this@MainActivity, "Now your name: $mUsername", Toast.LENGTH_SHORT).show()
+//                                                        mNameView!!.setText(mUsername)
+//                                                    }
+//                                                }
+//                                            })
+
                                     mFirebaseUser!!.updateProfile(profileUpdate)
-                                            .addOnCompleteListener(object : OnCompleteListener<Void>() {
-                                                override fun onComplete(@NonNull task: Task<Void>) {
+                                            .addOnCompleteListener { task ->
+                                                 fun onComplete(@NonNull task: Task<Void>) {
                                                     if (task.isSuccessful()) {
                                                         mUsername = mFirebaseUser!!.getDisplayName()
                                                         mUid = mFirebaseUser!!.getUid()
@@ -271,7 +314,9 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                                                         mNameView!!.setText(mUsername)
                                                     }
                                                 }
-                                            })
+                                            }
+
+
                                 }
                             }
                         })//設定結束的子視窗
@@ -279,7 +324,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             }
             R.id.sign_out_menu -> {
                 mFirebaseAuth!!.signOut()
-                dbinstance.userDao().delete(dbinstance.userDao().getUser())
+                dbinstance?.userDao()?.delete(dbinstance?.userDao()?.getUser())
                 AppDatabase.destroyInstance()
                 startAnimatedActivity(Intent(this, SignInActivity::class.java))
             }
@@ -288,7 +333,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         }
         hideKeyboard(this)
         drawer = findViewById(R.id.drawer_layout)
-        drawer.closeDrawer(GravityCompat.START)
+        drawer?.closeDrawer(GravityCompat.START)
         return true
     }
 
@@ -305,15 +350,15 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         when (itemId) {
             R.id.school -> {
                 fragment = Schoolchat()
-                navigationView.setCheckedItem(itemId)
+                navigationView?.setCheckedItem(itemId)
             }
             R.id.div -> {
                 fragment = Department()
-                navigationView.setCheckedItem(itemId)
+                navigationView?.setCheckedItem(itemId)
             }
             else -> {
-                fragment = Course(sub1.findItem(itemId).toString())
-                navigationView.setCheckedItem(itemId)
+                fragment = Course(sub1?.findItem(itemId).toString())
+                navigationView?.setCheckedItem(itemId)
             }
         }
 
