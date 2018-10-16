@@ -14,9 +14,9 @@ abstract class AppDatabase : RoomDatabase() {
 
         private var INSTANCE: AppDatabase? = null
 
-        fun getAppDatabase(context: Context): AppDatabase? {
+        fun getAppDatabase(context: Context?): AppDatabase? {
             if (INSTANCE == null) {
-                INSTANCE = Room.databaseBuilder(context.applicationContext, AppDatabase::class.java, "user-database")
+                INSTANCE = Room.databaseBuilder(context!!.applicationContext, AppDatabase::class.java, "user-database")
                         // allow queries on the main thread.
                         // Don't do this on a real app! See PersistenceBasicSample for an example.
                         .allowMainThreadQueries()

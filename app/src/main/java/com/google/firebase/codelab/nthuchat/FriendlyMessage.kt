@@ -23,7 +23,7 @@ class FriendlyMessage {
     private var photoUrl: String? = null
     private var uid: String? = null
 
-    fun FriendlyMessage(text: String, name: String, photoUrl: String?, uid: String) {
+    constructor(text: String, name: String, photoUrl: String?, uid: String) {
         this.text = text
         this.name = name
         if (photoUrl != null && photoUrl.contains("..")) {
