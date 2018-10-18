@@ -9,7 +9,7 @@ class FinalAsyncHttpClient {
 
     var client: AsyncHttpClient? = null
 
-    fun FinalAsyncHttpClient(){
+    init {
         client = AsyncHttpClient()
         client?.setConnectTimeout(5)//5s超时
         if (CookieUtils.getCookies() != null) {//每次请求都要带上cookie
