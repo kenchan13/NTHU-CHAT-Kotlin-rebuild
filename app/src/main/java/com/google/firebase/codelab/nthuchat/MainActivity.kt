@@ -78,20 +78,20 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     var user: User? = null
     var sub1: Menu? = null
 
-    protected fun onCreate(savedInstanceState: Bundle) {
+    override protected fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         //Stetho.initializeWithDefaults(this);
         setContentView(R.layout.activity_main)
         navigationView = findViewById(R.id.nav_view)
-        var headerView: View? = navigationView?.getHeaderView(0)
-        mNameView = headerView!!.findViewById(R.id.nameView)
-        var mEmailView: TextView = headerView!!.findViewById(R.id.emailView)
-        var mIconView: ImageView = headerView?.findViewById(R.id.iconView)
+        var headerView: View = navigationView?.getHeaderView(0) as View
+        mNameView = headerView.findViewById(R.id.nameView)
+        var mEmailView: TextView = headerView.findViewById(R.id.emailView)
+        var mIconView: ImageView = headerView.findViewById(R.id.iconView)
 
         val toolbar = findViewById<Toolbar>(R.id.toolbar)
         setSupportActionBar(toolbar)
 
-        dbinstance = AppDatabase?.getAppDatabase(getApplicationContext())
+        dbinstance = AppDatabase.getAppDatabase(applicationContext)
         user = dbinstance?.userDao()?.getUser()
 
         drawer = findViewById(R.id.drawer_layout)
@@ -124,8 +124,8 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                     mPhotoUrl = "https://nthuchat.com" + mPhotoUrl!!.replace("..", "")
                 }
                 //Toast.makeText(this, "name:  "+mPhotoUrl, Toast.LENGTH_SHORT).show();
-                mNameView!!.setText(mUsername)
-                mEmailView!!.setText(mFirebaseUser!!.getEmail())
+                mNameView.setText(mUsername)
+                mEmailView.setText(mFirebaseUser!!.getEmail())
                 Picasso.with(this@MainActivity).load(mPhotoUrl).transform(CropCircleTransformation()).into(mIconView)
                 //mIconView.setImageURI(Uri.parse(mPhotoUrl));
             } else {
@@ -161,8 +161,8 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                                     mUsername = mFirebaseUser!!.getDisplayName()
                                     mUid = mFirebaseUser!!.getUid()
                                     mPhotoUrl = mFirebaseUser!!.getPhotoUrl().toString()
-                                    mNameView!!.setText(mUsername)
-                                    mEmailView!!.setText(mFirebaseUser!!.getEmail())
+                                    mNameView.setText(mUsername)
+                                    mEmailView.setText(mFirebaseUser!!.getEmail())
                                     if (mPhotoUrl != null && mPhotoUrl!!.contains("..")) {
                                         mPhotoUrl = "https://nthuchat.com" + mPhotoUrl!!.replace("..", "")
                                     }
@@ -176,9 +176,9 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         }
 
         if (user != null) {
-            navigationView?.getMenu()?.findItem(R.id.div)?.setTitle(user!!.getDiv())
-            val coursename = user!!.getClasses()
-            val course_title = coursename!!.split("#".toRegex()).dropLastWhile({ it.isEmpty() }).toTypedArray()
+            navigationView?.getMenu()?.findItem(R.id.div)?.setTitle(user!!.Div)
+            val coursename = user!!.Classes
+            val course_title = coursename.split("#".toRegex()).dropLastWhile({ it.isEmpty() }).toTypedArray()
             //Toast.makeText(this, "course.length: "+course_title.length, Toast.LENGTH_SHORT).show();
             if (course_title.size > 1) {
                 sub1 = navigationView?.getMenu()?.addSubMenu(R.id.course_menu, 49, 49, R.string.courses)
@@ -311,7 +311,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                                                         mUid = mFirebaseUser!!.getUid()
                                                         mPhotoUrl = mFirebaseUser!!.getPhotoUrl().toString()
                                                         Toast.makeText(this@MainActivity, "Now your name: $mUsername", Toast.LENGTH_SHORT).show()
-                                                        mNameView!!.setText(mUsername)
+                                                        mNameView.setText(mUsername)
                                                     }
                                                 }
                                             }
@@ -398,7 +398,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             if (view == null) {
                 view = View(activity)
             }
-            imm.hideSoftInputFromWindow(view!!.getWindowToken(), 0)
+            imm.hideSoftInputFromWindow(view.windowToken, 0)
         }
     }
 }

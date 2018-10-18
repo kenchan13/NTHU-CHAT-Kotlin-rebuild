@@ -1,16 +1,17 @@
 package com.google.firebase.codelab.nthuchat
 
 import android.annotation.SuppressLint
+import android.support.v4.app.Fragment
 import android.content.Context
+import android.content.Intent
 import android.content.SharedPreferences
 import android.net.Uri
 import android.os.Bundle
 import android.preference.PreferenceManager
-import android.support.annotation.NonNull
-import android.support.annotation.Nullable
 import android.support.design.widget.FloatingActionButton
-import android.support.v4.app.Fragment
+import android.support.design.widget.NavigationView
 import android.support.v4.content.ContextCompat
+import android.support.v4.widget.DrawerLayout
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.text.Editable
@@ -32,7 +33,6 @@ import com.firebase.ui.database.FirebaseRecyclerOptions
 import com.firebase.ui.database.SnapshotParser
 import com.google.android.gms.ads.AdRequest
 import com.google.android.gms.ads.AdView
-import com.google.android.gms.ads.MobileAds
 import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.api.GoogleApiClient
 import com.google.android.gms.tasks.OnCompleteListener
@@ -43,15 +43,20 @@ import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.UserProfileChangeRequest
-import com.google.firebase.database.*
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.DatabaseReference
+import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.Query
+import com.google.firebase.database.ValueEventListener
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig
 import com.google.firebase.remoteconfig.FirebaseRemoteConfigSettings
-
+import com.google.android.gms.ads.MobileAds
 import java.util.HashMap
 
 import de.hdodenhof.circleimageview.CircleImageView
 
-class Course : Fragment, GoogleApiClient.OnConnectionFailedListener {
+class Department : Fragment(), GoogleApiClient.OnConnectionFailedListener {
 
     inner class MessageViewHolder(v: View) : RecyclerView.ViewHolder(v) {
         internal var messageTextView: TextView
@@ -71,24 +76,18 @@ class Course : Fragment, GoogleApiClient.OnConnectionFailedListener {
         }
     }
 
-    constructor() : super() {}
-
-    @SuppressLint("ValidFragment")
-    constructor(title: String) : super() {
-        this.MESSAGES_CHILD = title
-    }
-
-
 //    var dbinstance: AppDatabase
 //
 //    var mUsername: String? = null
-//    var mPhotoUrl: String? = null
-//    var mUid: String? = null
+//    var mPhotoUrl: String
+//    var mUid: String
 //    var user: User? = null
+
+    var departmentlimit: Int = 0
 
     companion object {
 
-        private val TAG = "Course"
+        private val TAG = "Department"
         private val LOADING_IMAGE_URL = "https://www.google.com/images/spin-32.gif"
         val DEFAULT_MSG_LENGTH_LIMIT = 10
         val ANONYMOUS = "anonymous"
@@ -108,20 +107,22 @@ class Course : Fragment, GoogleApiClient.OnConnectionFailedListener {
     private var mFirebaseUser: FirebaseUser? = null
     private lateinit var mFirebaseAuth: FirebaseAuth
     private lateinit var mFirebaseDatabaseReference: DatabaseReference
-    private lateinit var mFirebaseAdapter: FirebaseRecyclerAdapter<FriendlyMessage, Course.MessageViewHolder>
+    private lateinit var mFirebaseAdapter: FirebaseRecyclerAdapter<FriendlyMessage, Department.MessageViewHolder>
     private lateinit var mFirebaseRemoteConfig: FirebaseRemoteConfig
     private lateinit var mFirebaseAnalytics: FirebaseAnalytics
     private val mAdView: AdView? = null
     private lateinit var countLabel: TextView
     private var countlength: Long = 0
 
-
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+        departmentlimit = 50
         //getSupportFragmentManager().beginTransaction().remove(currentFragment).commit();
         //inflate your activity layout here!
         @SuppressLint("InflateParams")
         val contentView = inflater.inflate(R.layout.activity_schoolchat, container, false)
+
         //MobileAds.initialize(getActivity(), "ca-app-pub-3589269405021012~8631287778");
+
         countLabel = contentView.findViewById(R.id.countLabel)
 
         val dbinstance = AppDatabase.getAppDatabase(context)
@@ -129,10 +130,14 @@ class Course : Fragment, GoogleApiClient.OnConnectionFailedListener {
 
         mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(activity)
         // Set default username is anonymous.
-        var mUsername: String = "ANONYMOUS"
+        var mUsername: String = ANONYMOUS
 
         lateinit var mPhotoUrl: String
         lateinit var mUid: String
+
+        if (user != null) {
+            MESSAGES_CHILD = user.Div
+        }
 
         // Initialize Firebase Auth
         mFirebaseAuth = FirebaseAuth.getInstance()
@@ -149,24 +154,26 @@ class Course : Fragment, GoogleApiClient.OnConnectionFailedListener {
             val profileUpdate = UserProfileChangeRequest.Builder()
                     .setDisplayName("無名勇士")
                     .setPhotoUri(Uri.parse("../images/user$picnum.jpg")).build()
-            mFirebaseUser?.updateProfile(profileUpdate)?.addOnCompleteListener { task ->
-                if (task.isSuccessful) {
-                    //Toast.makeText(MainActivity.this, "1Update AC Success", Toast.LENGTH_SHORT).show();
-                    mUsername = mFirebaseUser?.displayName as String
-                    mUid = mFirebaseUser?.uid as String
-                    mPhotoUrl = mFirebaseUser?.photoUrl.toString()
-                    //Toast.makeText(MainActivity.this, "1.5Displayname: "+mUsername, Toast.LENGTH_SHORT).show();
-                    //Toast.makeText(MainActivity.this, "1.5PhotoUrl: "+mPhotoUrl, Toast.LENGTH_SHORT).show();
-                }
-            }
+            mFirebaseUser!!.updateProfile(profileUpdate)
+                    .addOnCompleteListener { task ->
+                        if (task.isSuccessful) {
+                            //Toast.makeText(MainActivity.this, "1Update AC Success", Toast.LENGTH_SHORT).show();
+                            mUsername = mFirebaseUser?.displayName as String
+                            mUid = mFirebaseUser?.uid as String
+                            mPhotoUrl = mFirebaseUser?.photoUrl.toString()
+                            //Toast.makeText(MainActivity.this, "1.5Displayname: "+mUsername, Toast.LENGTH_SHORT).show();
+                            //Toast.makeText(MainActivity.this, "1.5PhotoUrl: "+mPhotoUrl, Toast.LENGTH_SHORT).show();
+                        }
+                    }
         }
+
 
         // Initialize ProgressBar and RecyclerView.
         mProgressBar = contentView.findViewById<View>(R.id.progressBar) as ProgressBar
         mMessageRecyclerView = contentView.findViewById<View>(R.id.messageRecyclerView) as RecyclerView
         mLinearLayoutManager = LinearLayoutManager(activity)
-        mLinearLayoutManager.setStackFromEnd(true)
-        mMessageRecyclerView.setLayoutManager(mLinearLayoutManager)
+        mLinearLayoutManager.stackFromEnd = true
+        mMessageRecyclerView.layoutManager = mLinearLayoutManager
 
         // New child entries
         mFirebaseDatabaseReference = FirebaseDatabase.getInstance().reference
@@ -177,47 +184,48 @@ class Course : Fragment, GoogleApiClient.OnConnectionFailedListener {
         }
 
         val messagesRef = mFirebaseDatabaseReference.child(MESSAGES_CHILD)
+        //Query query = messagesRef.limitToLast(departmentlimit);
         messagesRef.addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
                 if (!snapshot.hasChildren()) {
                     //Toast.makeText(getActivity(), R.string.emptymessage, Toast.LENGTH_SHORT).show();
-                    val friendlyMessage= FriendlyMessage("你可以成為第一個發言的人喔!", "NTHU Chat", "https://nthuchat.com/images/user1.jpg", "999999")
+                    val friendlyMessage = FriendlyMessage("你可以成為第一個發言的人喔!", "NTHU Chat", "https://nthuchat.com/images/user1.jpg", "999999")
                     mFirebaseDatabaseReference.child(MESSAGES_CHILD).push().setValue(friendlyMessage)
                 }
             }
 
             override fun onCancelled(databaseError: DatabaseError) {}
         })
+
         val options = FirebaseRecyclerOptions.Builder<FriendlyMessage>()
                 .setQuery(messagesRef, parser)
                 .build()
-        mFirebaseAdapter = object : FirebaseRecyclerAdapter<FriendlyMessage, Course.MessageViewHolder>(options) {
-            override fun onCreateViewHolder(viewGroup: ViewGroup, i: Int): Course.MessageViewHolder {
+        mFirebaseAdapter = object : FirebaseRecyclerAdapter<FriendlyMessage, Department.MessageViewHolder>(options) {
+            override fun onCreateViewHolder(viewGroup: ViewGroup, i: Int): Department.MessageViewHolder {
                 val inflaterLocal = LayoutInflater.from(viewGroup.context)
                 when (i) {
-                    0 -> return Course().MessageViewHolder(inflaterLocal.inflate(R.layout.item_message, viewGroup, false))
-                    1 -> return Course().MessageViewHolder(inflaterLocal.inflate(R.layout.item_message_me, viewGroup, false))
-                    else -> return Course().MessageViewHolder(inflaterLocal.inflate(R.layout.item_message, viewGroup, false))
+                    0 -> return Department().MessageViewHolder(inflaterLocal.inflate(R.layout.item_message, viewGroup, false))
+                    1 -> return Department().MessageViewHolder(inflaterLocal.inflate(R.layout.item_message_me, viewGroup, false))
+                    else -> return Department().MessageViewHolder(inflaterLocal.inflate(R.layout.item_message, viewGroup, false))
                 }
             }
 
             override fun getItemViewType(position: Int): Int {
-                if (getItem(position) != null && getItem(position).getUid() != null) {
+                return if (getItem(position) != null && getItem(position).getUid() != null) {
                     if (getItem(position).getUid() == mUid) {
-                        return 1
+                        1
                     } else {
-                        return 0
+                        0
                     }
-                }
-                return 0
+                } else 0
             }
 
-            override fun onBindViewHolder(viewHolder: Course.MessageViewHolder,
+            override fun onBindViewHolder(viewHolder: Department.MessageViewHolder,
                                           position: Int,
                                           friendlyMessage: FriendlyMessage) {
                 when (viewHolder.itemViewType) {
                     0 -> {
-                        mProgressBar.setVisibility(ProgressBar.INVISIBLE)
+                        mProgressBar.visibility = ProgressBar.INVISIBLE
                         if (friendlyMessage.getText() != null) {
                             viewHolder.messageTextView.text = friendlyMessage.getText()
                             viewHolder.messageTextView.visibility = TextView.VISIBLE
@@ -227,13 +235,13 @@ class Course : Fragment, GoogleApiClient.OnConnectionFailedListener {
                             viewHolder.messengerImageView.setImageDrawable(ContextCompat.getDrawable(activity!!,
                                     R.drawable.ic_account_circle_black_36dp))
                         } else {
-                            Glide.with(this@Course)
+                            Glide.with(this@Department)
                                     .load(friendlyMessage.getPhotoUrl())
                                     .into(viewHolder.messengerImageView)
                         }
                     }
                     1 -> {
-                        mProgressBar.setVisibility(ProgressBar.INVISIBLE)
+                        mProgressBar.visibility = ProgressBar.INVISIBLE
                         if (friendlyMessage.getText() != null) {
                             viewHolder.messageTextView.text = friendlyMessage.getText()
                             viewHolder.messageTextView.visibility = TextView.VISIBLE
@@ -243,7 +251,7 @@ class Course : Fragment, GoogleApiClient.OnConnectionFailedListener {
                             viewHolder.messengerImageView.setImageDrawable(ContextCompat.getDrawable(activity!!,
                                     R.drawable.ic_account_circle_black_36dp))
                         } else {
-                            Glide.with(this@Course)
+                            Glide.with(this@Department)
                                     .load(friendlyMessage.getPhotoUrl())
                                     .into(viewHolder.messengerImageView)
                         }
@@ -260,7 +268,7 @@ class Course : Fragment, GoogleApiClient.OnConnectionFailedListener {
         mFirebaseAdapter.registerAdapterDataObserver(object : RecyclerView.AdapterDataObserver() {
             override fun onItemRangeInserted(positionStart: Int, itemCount: Int) {
                 super.onItemRangeInserted(positionStart, itemCount)
-                val friendlyMessageCount = mFirebaseAdapter.getItemCount()
+                val friendlyMessageCount = mFirebaseAdapter.itemCount
                 val lastVisiblePosition = mLinearLayoutManager.findLastCompletelyVisibleItemPosition()
                 // If the recycler view is initially being loaded or the
                 // user is at the bottom of the list, scroll to the bottom
@@ -271,11 +279,11 @@ class Course : Fragment, GoogleApiClient.OnConnectionFailedListener {
             }
         })
 
-        mMessageRecyclerView.setAdapter(mFirebaseAdapter)
+        mMessageRecyclerView.adapter = mFirebaseAdapter
 
         mMessageEditText = contentView.findViewById<View>(R.id.messageEditText) as EditText
-        mMessageEditText.setFilters(arrayOf<InputFilter>(InputFilter.LengthFilter(mSharedPreferences
-                .getInt(CodelabPreferences().FRIENDLY_MSG_LENGTH, DEFAULT_MSG_LENGTH_LIMIT))))
+        mMessageEditText.filters = arrayOf<InputFilter>(InputFilter.LengthFilter(mSharedPreferences
+                .getInt(CodelabPreferences().FRIENDLY_MSG_LENGTH, DEFAULT_MSG_LENGTH_LIMIT)))
         mMessageEditText.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(charSequence: CharSequence, i: Int, i1: Int, i2: Int) {}
 
@@ -283,12 +291,12 @@ class Course : Fragment, GoogleApiClient.OnConnectionFailedListener {
                 if (charSequence.toString().trim { it <= ' ' }.length > 0) {
                     //Toast.makeText(MainActivity.this, "true", Toast.LENGTH_SHORT).show();
                     val current_length = charSequence.toString().trim { it <= ' ' }.length
-                    countLabel.setText(current_length.toString() + "/" + countlength)
-                    mSendButton.setEnabled(true)
+                    countLabel.text = current_length.toString() + "/" + countlength
+                    mSendButton.isEnabled = true
                 } else {
                     //Toast.makeText(MainActivity.this, "false", Toast.LENGTH_SHORT).show();
-                    countLabel.setText("0/$countlength")
-                    mSendButton.setEnabled(false)
+                    countLabel.text = "0/$countlength"
+                    mSendButton.isEnabled = false
                 }
             }
 
@@ -413,4 +421,5 @@ class Course : Fragment, GoogleApiClient.OnConnectionFailedListener {
         Log.d(TAG, "onConnectionFailed:$connectionResult")
         Toast.makeText(activity, "Google Play Services error.", Toast.LENGTH_SHORT).show()
     }
+
 }

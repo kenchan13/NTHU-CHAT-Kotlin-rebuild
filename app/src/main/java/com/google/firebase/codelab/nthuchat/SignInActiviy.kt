@@ -201,7 +201,7 @@ class SignInActivity : AppCompatActivity(), GoogleApiClient.OnConnectionFailedLi
     fun login(email: String, passwd: String) {
         val params = RequestParams()
         var finalAsyncHttpClient: FinalAsyncHttpClient = FinalAsyncHttpClient()
-        client = finalAsyncHttpClient?.getAsyncHttpClient()
+        client = finalAsyncHttpClient.getAsyncHttpClient()
         CookieUtils.saveCookie(client, this)
         val myCookieStore = PersistentCookieStore(this@SignInActivity)
         client?.setCookieStore(myCookieStore)
@@ -335,7 +335,7 @@ class SignInActivity : AppCompatActivity(), GoogleApiClient.OnConnectionFailedLi
                         //Toast.makeText(SignInActivity.this, "Login Firebase Success.", Toast.LENGTH_SHORT).show();
                         val user = User()
                         mFBdiv.child("div").setValue(div)
-                        user.setDiv(div)
+                        user.Div = div
                         client?.get("http://lms.nthu.edu.tw/home.php", object : AsyncHttpResponseHandler() {
                             override fun onFailure(statusCode: Int, headers: Array<Header>,
                                                    responseBody: ByteArray, error: Throwable) {
@@ -384,7 +384,7 @@ class SignInActivity : AppCompatActivity(), GoogleApiClient.OnConnectionFailedLi
             title_name += "$final_name#"
             //Toast.makeText(this, final_name, Toast.LENGTH_SHORT).show();
         }
-        user.setClasses(title_name)
+        user.Classes = title_name
     }
 
 }
