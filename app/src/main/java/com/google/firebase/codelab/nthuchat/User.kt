@@ -13,8 +13,8 @@ class User {
     var uid: Int = 0
 
     @ColumnInfo(name = "div")
-    var Div: String = ""
+    var Div: String? = null
 
     @ColumnInfo(name = "classes")
-    var Classes: String = ""
+    var Classes: String? = null
 }

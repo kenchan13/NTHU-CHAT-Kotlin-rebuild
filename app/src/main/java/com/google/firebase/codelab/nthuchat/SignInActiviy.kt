@@ -81,7 +81,7 @@ class SignInActivity : AppCompatActivity(), GoogleApiClient.OnConnectionFailedLi
     private var mFirebaseDB: FirebaseDatabase? = null
     //private var mFBdiv: DatabaseReference? = null
     var user: User? = null
-    var dbinstance: AppDatabase? = null
+    lateinit var dbinstance: AppDatabase
     // var fire_div: String? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -95,9 +95,9 @@ class SignInActivity : AppCompatActivity(), GoogleApiClient.OnConnectionFailedLi
         setContentView(R.layout.activity_sign_in)
 
         dbinstance = AppDatabase.getAppDatabase(applicationContext)
-        if (dbinstance?.userDao()?.getUser() != null) {
-            val targetUser: User? = dbinstance?.userDao()?.getUser()
-            dbinstance?.userDao()?.delete(targetUser)
+        if (dbinstance.userDao().getUser() != null) {
+            val targetUser: User? = dbinstance.userDao().getUser()
+            dbinstance.userDao().delete(targetUser as User)
         }
 
         // Assign fields
@@ -123,7 +123,6 @@ class SignInActivity : AppCompatActivity(), GoogleApiClient.OnConnectionFailedLi
         // Initialize FirebaseAuth
         mFirebaseAuth = FirebaseAuth.getInstance()
         mFirebaseDB = FirebaseDatabase.getInstance()
-
 
     }
 
@@ -328,7 +327,7 @@ class SignInActivity : AppCompatActivity(), GoogleApiClient.OnConnectionFailedLi
         mFirebaseAuth!!.signInWithEmailAndPassword(email, password)
                 .addOnCompleteListener(this) { task_sign ->
                     if (task_sign.isSuccessful) {
-                        user = User()
+                        //user = User()
                         // Sign in success, update UI with the signed-in user's information
                         Log.d(TAG, "signInWithEmail:success")
                         var mFBdiv: DatabaseReference = mFirebaseDB!!.getReference("/users/" + mFirebaseAuth!!.currentUser!!.uid)
@@ -345,7 +344,7 @@ class SignInActivity : AppCompatActivity(), GoogleApiClient.OnConnectionFailedLi
                                 val json = String(data)
                                 val document_unbox = Jsoup.parse(json)
                                 analysecourse(document_unbox, user)
-                                dbinstance?.userDao()?.insertAll(user)
+                                dbinstance.userDao().insertAll(user)
                                 startActivity(Intent(this@SignInActivity, MainActivity::class.java))
                                 finish()
                             }

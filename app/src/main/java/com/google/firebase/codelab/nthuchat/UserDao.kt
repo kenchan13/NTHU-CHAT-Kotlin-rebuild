@@ -19,7 +19,7 @@ interface UserDao {
     fun findByName(div: String, classes: String): User
 
     @Insert
-    fun insertAll(vararg users: User?)
+    fun insertAll(vararg users: User)
 
     @Update
     fun update(user: User)
@@ -28,5 +28,5 @@ interface UserDao {
     fun deleteAll(vararg users: User)
 
     @Delete
-    fun delete(user: User?)
+    fun delete(user: User)
 }

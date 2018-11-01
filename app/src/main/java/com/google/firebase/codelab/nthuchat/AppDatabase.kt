@@ -14,7 +14,7 @@ abstract class AppDatabase : RoomDatabase() {
 
         private var INSTANCE: AppDatabase? = null
 
-        fun getAppDatabase(context: Context?): AppDatabase? {
+        fun getAppDatabase(context: Context?): AppDatabase {
             if (INSTANCE == null) {
                 INSTANCE = Room.databaseBuilder(context!!.applicationContext, AppDatabase::class.java, "user-database")
                         // allow queries on the main thread.
@@ -22,7 +22,7 @@ abstract class AppDatabase : RoomDatabase() {
                         .allowMainThreadQueries()
                         .build()
             }
-            return INSTANCE
+            return INSTANCE!!
         }
 
         fun destroyInstance() {

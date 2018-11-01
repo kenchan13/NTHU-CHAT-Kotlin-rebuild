@@ -125,7 +125,7 @@ class Course : Fragment, GoogleApiClient.OnConnectionFailedListener {
         countLabel = contentView.findViewById(R.id.countLabel)
 
         val dbinstance = AppDatabase.getAppDatabase(context)
-        val user: User? = dbinstance?.userDao()?.getUser()
+        val user: User? = dbinstance.userDao().getUser()
 
         mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(activity)
         // Set default username is anonymous.
@@ -170,10 +170,12 @@ class Course : Fragment, GoogleApiClient.OnConnectionFailedListener {
 
         // New child entries
         mFirebaseDatabaseReference = FirebaseDatabase.getInstance().reference
-        val parser = SnapshotParser<FriendlyMessage> { dataSnapshot ->
-            val friendlyMessage = dataSnapshot.getValue(FriendlyMessage::class.java)
-            friendlyMessage?.setId(dataSnapshot.key!!)
-            friendlyMessage as FriendlyMessage
+        val parser = object : SnapshotParser<FriendlyMessage> {
+            override fun parseSnapshot(dataSnapshot: DataSnapshot): FriendlyMessage {
+                val friendlyMessage = dataSnapshot.getValue(FriendlyMessage::class.java)
+                friendlyMessage?.setId(dataSnapshot.key!!)
+                return friendlyMessage!!
+            }
         }
 
         val messagesRef = mFirebaseDatabaseReference.child(MESSAGES_CHILD)

@@ -78,9 +78,9 @@ class Schoolchat : Fragment(), GoogleApiClient.OnConnectionFailedListener {
         }
     }
 
-//    var mUsername: String? = null
-//    var mPhotoUrl: String
-//    var mUid: String
+    lateinit var mUsername: String
+    lateinit var mPhotoUrl: String
+    lateinit var mUid: String
 
     companion object {
 
@@ -122,10 +122,10 @@ class Schoolchat : Fragment(), GoogleApiClient.OnConnectionFailedListener {
         countLabel = contentView.findViewById(R.id.countLabel)
         mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(activity)
         // Set default username is anonymous.
-        var mUsername: String = "ANONYMOUS"
+        mUsername = ANONYMOUS
 
-        lateinit var mPhotoUrl: String
-        lateinit var mUid: String
+//        lateinit var mPhotoUrl: String
+//        lateinit var mUid: String
 
         // Initialize Firebase Auth
         mFirebaseAuth = FirebaseAuth.getInstance()
@@ -162,13 +162,16 @@ class Schoolchat : Fragment(), GoogleApiClient.OnConnectionFailedListener {
         mLinearLayoutManager.stackFromEnd = true
         mMessageRecyclerView.layoutManager = mLinearLayoutManager
 
-        // New child entries
+        //New child entries
         mFirebaseDatabaseReference = FirebaseDatabase.getInstance().reference
-        val parser = SnapshotParser<FriendlyMessage> { dataSnapshot ->
-            val friendlyMessage = dataSnapshot.getValue(FriendlyMessage::class.java)
-            friendlyMessage?.setId(dataSnapshot.key!!)
-            friendlyMessage as FriendlyMessage
+        val parser = object : SnapshotParser<FriendlyMessage?> {
+            override fun parseSnapshot(dataSnapshot: DataSnapshot): FriendlyMessage {
+                val friendlyMessage = dataSnapshot.getValue(FriendlyMessage::class.java)
+                friendlyMessage?.setId(dataSnapshot.key!!)
+                return friendlyMessage!!
+            }
         }
+
 
         val messagesRef = mFirebaseDatabaseReference.child(MESSAGES_CHILD)
         val options = FirebaseRecyclerOptions.Builder<FriendlyMessage>()

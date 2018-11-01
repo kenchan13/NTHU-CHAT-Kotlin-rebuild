@@ -8,7 +8,7 @@ apply plugin: 'kotlin-kapt'
 
 android {
     compileSdkVersion 27
-    buildToolsVersion "28.0.2"
+    buildToolsVersion "28.0.3"
     defaultConfig {
         applicationId "com.nthuchat.demo"
         minSdkVersion 21
@@ -69,6 +69,7 @@ dependencies {
     implementation 'com.google.firebase:firebase-crash:16.0.1'
     implementation 'com.google.firebase:firebase-appindexing:16.0.1'
     implementation 'com.google.firebase:firebase-ads:15.0.1'
+
     // Firebase UI
     implementation 'com.firebaseui:firebase-ui-database:4.1.0'
 

@@ -74,13 +74,13 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     lateinit var currentFragment: Fragment
     //private val mFirebaseDB: FirebaseDatabase? = null  //WTF
     //private val mFBdiv: DatabaseReference? = null  //WTF
-    var dbinstance: AppDatabase? = null
+    lateinit var dbinstance: AppDatabase
     var user: User? = null
     var sub1: Menu? = null
 
     override protected fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        //Stetho.initializeWithDefaults(this);
+        Stetho.initializeWithDefaults(this);
         setContentView(R.layout.activity_main)
         navigationView = findViewById(R.id.nav_view)
         var headerView: View = navigationView?.getHeaderView(0) as View
@@ -92,7 +92,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         setSupportActionBar(toolbar)
 
         dbinstance = AppDatabase.getAppDatabase(applicationContext)
-        user = dbinstance?.userDao()?.getUser()
+        user = dbinstance.userDao().getUser()
 
         drawer = findViewById(R.id.drawer_layout)
         val toggle = object : ActionBarDrawerToggle(
@@ -177,7 +177,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
         if (user != null) {
             navigationView?.getMenu()?.findItem(R.id.div)?.setTitle(user!!.Div)
-            val coursename = user!!.Classes
+            val coursename = user!!.Classes as String
             val course_title = coursename.split("#".toRegex()).dropLastWhile({ it.isEmpty() }).toTypedArray()
             //Toast.makeText(this, "course.length: "+course_title.length, Toast.LENGTH_SHORT).show();
             if (course_title.size > 1) {
@@ -324,7 +324,8 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             }
             R.id.sign_out_menu -> {
                 mFirebaseAuth!!.signOut()
-                dbinstance?.userDao()?.delete(dbinstance?.userDao()?.getUser())
+                val targetUser: User = dbinstance.userDao().getUser()
+                dbinstance.userDao().delete(targetUser)
                 AppDatabase.destroyInstance()
                 startAnimatedActivity(Intent(this, SignInActivity::class.java))
             }

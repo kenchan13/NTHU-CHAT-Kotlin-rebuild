@@ -136,7 +136,7 @@ class Department : Fragment(), GoogleApiClient.OnConnectionFailedListener {
         lateinit var mUid: String
 
         if (user != null) {
-            MESSAGES_CHILD = user.Div
+            MESSAGES_CHILD = user.Div as String
         }
 
         // Initialize Firebase Auth
@@ -177,10 +177,12 @@ class Department : Fragment(), GoogleApiClient.OnConnectionFailedListener {
 
         // New child entries
         mFirebaseDatabaseReference = FirebaseDatabase.getInstance().reference
-        val parser = SnapshotParser<FriendlyMessage> { dataSnapshot ->
-            val friendlyMessage = dataSnapshot.getValue(FriendlyMessage::class.java)
-            friendlyMessage?.setId(dataSnapshot.key!!)
-            friendlyMessage as FriendlyMessage
+        val parser = object : SnapshotParser<FriendlyMessage> {
+            override fun parseSnapshot(dataSnapshot: DataSnapshot): FriendlyMessage {
+                val friendlyMessage = dataSnapshot.getValue(FriendlyMessage::class.java)
+                friendlyMessage?.setId(dataSnapshot.key!!)
+                return friendlyMessage!!
+            }
         }
 
         val messagesRef = mFirebaseDatabaseReference.child(MESSAGES_CHILD)
