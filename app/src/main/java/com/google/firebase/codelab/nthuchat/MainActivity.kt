@@ -1,6 +1,7 @@
 package com.google.firebase.codelab.nthuchat
 
 import android.app.Activity
+import android.content.ClipData
 import android.content.Context
 import android.support.v4.app.Fragment
 import android.content.DialogInterface
@@ -52,6 +53,7 @@ import com.google.firebase.remoteconfig.FirebaseRemoteConfig
 import com.squareup.picasso.Picasso
 
 import jp.wasabeef.picasso.transformations.CropCircleTransformation
+import kotlinx.android.synthetic.main.layers_demo.*
 
 class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener, GoogleApiClient.OnConnectionFailedListener {
 
@@ -172,6 +174,9 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                         }
 
             }
+
+
+
 
         }
 
@@ -357,6 +362,17 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 fragment = Department()
                 navigationView?.setCheckedItem(itemId)
             }
+
+
+            R.id.discover -> {
+                //fragment = Department()
+                navigationView?.setCheckedItem(itemId)
+                val intent = Intent(this, NewActivity::class.java)
+                startActivity(intent)
+                Log.d(TAG, "discover onclicked")
+            }
+
+
             else -> {
                 fragment = Course(sub1?.findItem(itemId).toString())
                 navigationView?.setCheckedItem(itemId)

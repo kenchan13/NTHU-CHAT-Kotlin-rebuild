@@ -32,10 +32,12 @@
 
     <string name="action_settings">Settings</string>
     <string name="channels">Channels</string>
+    <string name="map">Map</string>
     <string name="courses">Courses</string>
     <string name="div">Department</string>
     <string name="emptymessage">You can be the first one to talk!</string>
     <string name="facebook">Facebook</string>
+    <string name="discover">Discover</string>
 
     <!-- Basic Map Demo -->
     <string name="basic_demo_label">Basic Map</string>

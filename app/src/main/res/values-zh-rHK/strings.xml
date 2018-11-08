@@ -29,6 +29,8 @@
     <string name="navigation_drawer_close">Close navigation drawer</string>
     <string name="action_settings">設定</string>
     <string name="channels">大型頻道</string>
+    <string name="map">地圖</string>
+    <string name="discover">探索</string>
     <string name="div">系所</string>
     <string name="courses">課程頻道</string>
     <string name="emptymessage">你可以成為第一個發言的人!</string>

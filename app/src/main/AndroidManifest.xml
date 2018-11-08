@@ -27,6 +27,17 @@
         <activity
             android:name=".SignInActivity"
             android:screenOrientation="portrait" />
+        <activity
+            android:name=".NewActivity"
+            android:screenOrientation="portrait" />
+        <!--<activity-->
+            <!--android:name=".DiscoverActivity"-->
+            <!--android:screenOrientation="portrait" />-->
+        <activity
+            android:name=".LayersDemoActivity"
+            android:screenOrientation="portrait" />
+
+
 
         <service
             android:name=".MyFirebaseMessagingService"
