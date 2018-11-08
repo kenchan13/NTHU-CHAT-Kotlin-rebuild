@@ -374,7 +374,7 @@ class SignInActivity : AppCompatActivity(), GoogleApiClient.OnConnectionFailedLi
             val title = elements[i].text().split("".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
             //Log.d(TAG, title);
             for (m in title.indices) {
-                if (title[m].matches("[A-Za-z0-9() &,-]*".toRegex())) {
+                if (title[m].matches("[A-Za-z0-9() &:,-]*".toRegex())) {
                     title[m] = ""
                 } else {
                     final_name += title[m]
