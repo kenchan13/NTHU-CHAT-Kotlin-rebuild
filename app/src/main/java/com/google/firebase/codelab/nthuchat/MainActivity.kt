@@ -50,12 +50,15 @@ import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig
+import com.livinglifetechway.quickpermissions_kotlin.runWithPermissions
+
 import com.squareup.picasso.Picasso
 
 import jp.wasabeef.picasso.transformations.CropCircleTransformation
 import kotlinx.android.synthetic.main.layers_demo.*
+import android.Manifest
 
-class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener, GoogleApiClient.OnConnectionFailedListener {
+class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener, GoogleApiClient.OnConnectionFailedListener, DiscoverFragment.OnFragmentInteractionListener {
 
     // Firebase instance variables
     private var mFirebaseAuth: FirebaseAuth? = null
@@ -80,6 +83,8 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     var user: User? = null
     var sub1: Menu? = null
 
+    lateinit var discoverFragment: DiscoverFragment
+
     override protected fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         Stetho.initializeWithDefaults(this);
@@ -95,6 +100,8 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
         dbinstance = AppDatabase.getAppDatabase(applicationContext)
         user = dbinstance.userDao().getUser()
+
+        discoverFragment = DiscoverFragment.newInstance()
 
         drawer = findViewById(R.id.drawer_layout)
         val toggle = object : ActionBarDrawerToggle(
@@ -175,9 +182,6 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
             }
 
-
-
-
         }
 
         if (user != null) {
@@ -199,8 +203,21 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         }
         navigationView?.setNavigationItemSelectedListener(this)
         displaySelectedScreen(R.id.school)
+
+
+        methodWithPermissions()
     }
 
+    fun methodWithPermissions() = runWithPermissions(Manifest.permission.CAMERA, Manifest.permission.ACCESS_FINE_LOCATION) {
+        Toast.makeText(this, "Camera and audio recording permissions granted", Toast.LENGTH_SHORT).show();
+        // Do the stuff with permissions safely
+
+    }
+
+//    @WithPermissions(permission = [Manifest.permission.CAMERA])
+//    private fun methodWithPermissions(){
+//
+//    }
 
     override fun onBackPressed() {
         drawer = findViewById(R.id.drawer_layout)
@@ -365,11 +382,15 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
 
             R.id.discover -> {
-                //fragment = Department()
+                fragment = DiscoverFragment()
                 navigationView?.setCheckedItem(itemId)
-                val intent = Intent(this, NewActivity::class.java)
-                startActivity(intent)
-                Log.d(TAG, "discover onclicked")
+//                fragment = DiscoverFragment()
+//                navigationView?.setCheckedItem(itemId)
+                //fragment = Department()
+//                navigationView?.setCheckedItem(itemId)
+//                val intent = Intent(this, NewActivity::class.java)
+//                startActivity(intent)
+//                Log.d(TAG, "discover onclicked")
             }
 
 
@@ -417,5 +438,10 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             }
             imm.hideSoftInputFromWindow(view.windowToken, 0)
         }
+    }
+
+    override fun onFragmentInteraction(uri: Uri) {
+        // For linking activities and fragment to prevent crash
+        Log.d("onfragmentinteraction", "")
     }
 }

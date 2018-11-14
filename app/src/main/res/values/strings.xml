@@ -74,11 +74,11 @@
     <string name="hybrid">Hybrid</string>
     <string name="indoor">Indoor</string>
     <!--<string-array name="layers_array">-->
-        <!--<item>@string/normal</item>-->
-        <!--<item>@string/hybrid</item>-->
-        <!--<item>@string/satellite</item>-->
-        <!--<item>@string/terrain</item>-->
-        <!--<item>@string/none_map</item>-->
+    <!--<item>@string/normal</item>-->
+    <!--<item>@string/hybrid</item>-->
+    <!--<item>@string/satellite</item>-->
+    <!--<item>@string/terrain</item>-->
+    <!--<item>@string/none_map</item>-->
     <!--</string-array>-->
     <string name="layers_demo_label">Layers</string>
     <string name="layers_demo_description">Demonstrates the different map layers.</string>
@@ -191,4 +191,7 @@
     <string name="vr_opera_house_button">SOH</string>
     <string name="vr_sfo_button">SFO</string>
     <string name="vr_australia_button">AUS</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>
