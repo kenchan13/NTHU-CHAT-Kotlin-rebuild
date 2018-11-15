@@ -38,6 +38,8 @@
     <string name="emptymessage">You can be the first one to talk!</string>
     <string name="facebook">Facebook</string>
     <string name="discover">Discover</string>
+    <string name="friends">Friends</string>
+    <string name="showFriends">Show Friends</string>
 
     <!-- Basic Map Demo -->
     <string name="basic_demo_label">Basic Map</string>

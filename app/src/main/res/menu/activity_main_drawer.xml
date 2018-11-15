@@ -28,6 +28,16 @@
         </menu>
     </item>
 
+    <item android:title="@string/friends" android:checkableBehavior="single" android:orderInCategory="1">
+        <menu>
+            <item
+                android:id="@+id/friends"
+                android:icon="@drawable/ic_dashboard_black_18dp"
+                android:title="@string/showFriends"
+                android:checkable="true"/>
+        </menu>
+    </item>
+
     <group android:id = "@+id/course_menu" android:checkableBehavior="single"/>
 
     <item android:title="@string/action_settings" android:orderInCategory="999">

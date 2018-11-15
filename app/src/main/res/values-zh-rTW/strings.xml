@@ -35,4 +35,6 @@
     <string name="courses">課程頻道</string>
     <string name="emptymessage">你可以成為第一個發言的人!</string>
     <string name="facebook">Facebook</string>
+    <string name="friends">朋友</string>
+    <string name="showFriends">顯示朋友</string>
 </resources>

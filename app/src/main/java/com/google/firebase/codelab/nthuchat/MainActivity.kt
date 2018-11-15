@@ -60,7 +60,7 @@ import android.Manifest
 import android.location.LocationManager
 import android.provider.Settings
 
-class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener, GoogleApiClient.OnConnectionFailedListener, DiscoverFragment.OnFragmentInteractionListener {
+class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener, GoogleApiClient.OnConnectionFailedListener, DiscoverFragment.OnFragmentInteractionListener, FriendListFragment.OnFragmentInteractionListener {
 
     // Firebase instance variables
     private var mFirebaseAuth: FirebaseAuth? = null
@@ -399,6 +399,10 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 //                Log.d(TAG, "discover onclicked")
             }
 
+            R.id.friends -> {
+                fragment = FriendListFragment()
+                navigationView?.setCheckedItem(itemId)
+            }
 
             else -> {
                 fragment = Course(sub1?.findItem(itemId).toString())
