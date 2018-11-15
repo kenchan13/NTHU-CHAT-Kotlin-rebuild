@@ -216,6 +216,7 @@ class SignInActivity : AppCompatActivity(), GoogleApiClient.OnConnectionFailedLi
                     var fire_email = ""
                     var fire_passwd = ""
                     var fire_div = ""
+                    var fire_name = ""
 
                     if (test == "true") {
                         try {
@@ -223,12 +224,13 @@ class SignInActivity : AppCompatActivity(), GoogleApiClient.OnConnectionFailedLi
                             fire_email = jsonObj.getJSONObject("ret").getString("email")
                             fire_passwd = jsonObj.getJSONObject("ret").getString("name") + "_ilmschat"
                             fire_div = jsonObj.getJSONObject("ret").getString("divName")
+                            fire_name = jsonObj.getJSONObject("ret").getString("name")
                             //Toast.makeText(LoginActivity.this,jsonObj.getString("ret"), Toast.LENGTH_SHORT).show();
                             //Toast.makeText(LoginActivity.this,jsonObj.getJSONObject("ret").getString("email"), Toast.LENGTH_SHORT).show();
                             //Log.d(TAG, jsonObj.getString("email"));
                             //Log.d(TAG, jsonObj.getString("status"));
                             createAccount(fire_email, fire_passwd)
-                            signIn_ac(fire_email, fire_passwd, fire_div, jsonObj)
+                            signIn_ac(fire_email, fire_passwd, fire_name, fire_div, jsonObj)
                         } catch (e: Exception) {
                             Log.d(TAG, "Json login Firebase Fail")
                         }
@@ -320,7 +322,7 @@ class SignInActivity : AppCompatActivity(), GoogleApiClient.OnConnectionFailedLi
         }
     }
 
-    private fun signIn_ac(email: String, password: String, div: String, jsonObj: JSONObject) {
+    private fun signIn_ac(email: String, password: String, name: String, div: String, jsonObj: JSONObject) {
         Log.d(TAG, "signIn_ac:$email")
         Log.d(TAG, "mFirebaseAuth :" + mFirebaseAuth!!)
         // [START sign_in_with_email]
@@ -334,6 +336,7 @@ class SignInActivity : AppCompatActivity(), GoogleApiClient.OnConnectionFailedLi
                         //Toast.makeText(SignInActivity.this, "Login Firebase Success.", Toast.LENGTH_SHORT).show();
                         val user = User()
                         mFBdiv.child("div").setValue(div)
+                        mFBdiv.child("name").setValue(name)
                         user.Div = div
                         client?.get("http://lms.nthu.edu.tw/home.php", object : AsyncHttpResponseHandler() {
                             override fun onFailure(statusCode: Int, headers: Array<Header>,

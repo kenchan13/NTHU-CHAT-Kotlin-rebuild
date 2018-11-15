@@ -16,7 +16,14 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.database.DatabaseReference
 import android.Manifest
+import android.location.Location
+import android.os.Handler
 import android.support.v4.app.ActivityCompat
+import android.widget.RelativeLayout
+import com.google.android.gms.maps.CameraUpdateFactory
+import com.google.android.gms.maps.SupportMapFragment
+import com.google.android.gms.maps.model.LatLng
+import com.google.firebase.database.FirebaseDatabase
 
 //import com.google.firebase.codelab.nthuchat
 
@@ -34,20 +41,20 @@ private const val ARG_PARAM2 = "param2"
  * create an instance of this fragment.
  *
  */
-class DiscoverFragment : Fragment(), OnMapReadyCallback {
+class DiscoverFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMyLocationChangeListener {
     // TODO: Rename and change types of parameters
     private var param1: String? = null
     private var param2: String? = null
     private var listener: OnFragmentInteractionListener? = null
 
     // Firebase instance variables
-//    private var mFirebaseUser: FirebaseUser? = null
-//    private lateinit var mFirebaseAuth: FirebaseAuth
-//    private lateinit var mFirebaseDatabaseReference: DatabaseReference
+    private var mFirebaseUser: FirebaseUser? = null
+    private lateinit var mFirebaseAuth: FirebaseAuth
+    private lateinit var mFirebaseDatabaseReference: DatabaseReference
 
     // Get Permission for Google Map
     private val LOCATION_REQUEST_CODE = 101
-    private var mMap: GoogleMap? = null
+    private lateinit var mMap: GoogleMap
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -55,22 +62,58 @@ class DiscoverFragment : Fragment(), OnMapReadyCallback {
             param1 = it.getString(ARG_PARAM1)
             param2 = it.getString(ARG_PARAM2)
         }
+
+//        val mapFragment = fragmentManager?.findFragmentById(R.id.mapBox) as SupportMapFragment
+//        mapFragment.getMapAsync(this)
+//
+        //GPS button Position
+//        val locationButton = (mapFragment.view!!.findViewById<View>(Integer.parseInt("1")).parent as View).findViewById<View>(Integer.parseInt("2"))
+//
+//        val rlp = locationButton.layoutParams as RelativeLayout.LayoutParams
+//        rlp.addRule(RelativeLayout.ALIGN_PARENT_TOP, RelativeLayout.TRUE)
+//        rlp.setMargins(0, 50, 30, 0)
     }
 
-    override fun onMapReady(googleMap: GoogleMap) {
-        mMap = googleMap
+    // upload my Location
+    override fun onMyLocationChange(location: Location){
+        // Getting latitude of the current location
+        var latitude = location.latitude;
+        // Getting longitude of the current location
+        var longitude = location.longitude;
+
+
+//        var database = FirebaseDatabase.getInstance()
+//        var gps = GPS(latitude, longitude)
+//        var mAuth = FirebaseAuth.getInstance()
+//        var currentUser = mAuth!!.currentUser
+//        val userID = currentUser!!.uid
+//        var ref = database.getReference("gps_data/$userID")
+//        ref.setValue(gps)
+
+//        mMap.setOnMyLocationChangeListener(null)
+    }
+
+
+
+    override fun onMapReady(googleMap: GoogleMap?) {
+        mMap = googleMap  ?: return
+
+        val NTHU = LatLng(24.794740, 120.993217)
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(NTHU, 16.5F))
 
         if (mMap != null) {
-            val permission = getActivity()!!.checkSelfPermission(
-                    Manifest.permission.ACCESS_FINE_LOCATION)
-
-            if (permission == PackageManager.PERMISSION_GRANTED) {
-                mMap?.isMyLocationEnabled = true
-            } else {
-                requestPermission(
-                        Manifest.permission.ACCESS_FINE_LOCATION,
-                        LOCATION_REQUEST_CODE)
-            }
+//            val NTHU = LatLng(24.794740, 120.993217)
+//            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(NTHU, 16.5F))
+//        map.setOnMyLocationClickListener(this)
+            //map.setOnMyLocationChangeListener(myLocationChangeListener)
+//            val updateUserLocationDelay = Handler()
+//            updateUserLocationDelay.postDelayed(object : Runnable {
+//                override fun run() {
+////                    mMap.setOnMyLocationChangeListener(this@DiscoverFragment)
+////                    getOtherUserLocation()
+//                    updateUserLocationDelay.postDelayed(this, 100000)
+//                }
+//            }, 100)
         }
     }
 

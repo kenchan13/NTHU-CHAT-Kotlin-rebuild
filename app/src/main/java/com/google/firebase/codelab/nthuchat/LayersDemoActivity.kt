@@ -98,10 +98,8 @@ class LayersDemoActivity :
         }
 
 
-
         bottomNavBarMap()
         checkLocation()
-
     }
 
     /**
@@ -199,29 +197,29 @@ class LayersDemoActivity :
 //                val message = dataSnapshot.getValue(Message::class.java)
                 map.clear()
                 for(child in dataSnapshot.children){
-                        val userLocation = child.getValue(GPSOTHERUSER::class.java)
-                        val otherUserLat = userLocation!!.lat
-                        val otherUserLong = userLocation.long
-                        //get their name here
-                        //val name = userLocation.name
-                        //pass title with name
-                        val eachUserUid = child.key
-                        var mAuth = FirebaseAuth.getInstance()
-                        var currentUser = mAuth!!.currentUser
-                        val userID = currentUser!!.uid
+                    val userLocation = child.getValue(GPSOTHERUSER::class.java)
+                    val otherUserLat = userLocation!!.lat
+                    val otherUserLong = userLocation.long
+                    //get their name here
+                    //val name = userLocation.name
+                    //pass title with name
+                    val eachUserUid = child.key
+                    var mAuth = FirebaseAuth.getInstance()
+                    var currentUser = mAuth!!.currentUser
+                    val userID = currentUser!!.uid
 
-                        if(eachUserUid != userID){
-                            map.addMarker(MarkerOptions()
-                                    .position(LatLng(otherUserLat, otherUserLong))
-                                    .title("Other User here")
-                                    .icon(BitmapDescriptorFactory.fromResource(R.drawable.marker3))
-                            ).showInfoWindow()
-                        }else{
-                            map.addMarker(MarkerOptions()
-                                    .position(LatLng(otherUserLat, otherUserLong))
-                                    .title("I'm here")
-                            ).showInfoWindow()
-                        }
+                    if(eachUserUid != userID){
+                        map.addMarker(MarkerOptions()
+                                .position(LatLng(otherUserLat, otherUserLong))
+                                .title("Other User here")
+                                .icon(BitmapDescriptorFactory.fromResource(R.drawable.marker3))
+                        ).showInfoWindow()
+                    }else{
+                        map.addMarker(MarkerOptions()
+                                .position(LatLng(otherUserLat, otherUserLong))
+                                .title("I'm here")
+                        ).showInfoWindow()
+                    }
 
 //                    Toast.makeText(this@LayersDemoActivity, "$child $otherUserLat $otherUserLong",
 //                        Toast.LENGTH_SHORT).show()

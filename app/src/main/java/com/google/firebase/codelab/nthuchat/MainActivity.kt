@@ -57,6 +57,8 @@ import com.squareup.picasso.Picasso
 import jp.wasabeef.picasso.transformations.CropCircleTransformation
 import kotlinx.android.synthetic.main.layers_demo.*
 import android.Manifest
+import android.location.LocationManager
+import android.provider.Settings
 
 class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener, GoogleApiClient.OnConnectionFailedListener, DiscoverFragment.OnFragmentInteractionListener {
 
@@ -84,6 +86,8 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     var sub1: Menu? = null
 
     lateinit var discoverFragment: DiscoverFragment
+    private var locationManager: LocationManager? = null
+
 
     override protected fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -206,10 +210,12 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
 
         methodWithPermissions()
+//        showGPSAlert()
+        checkLocation()
     }
 
     fun methodWithPermissions() = runWithPermissions(Manifest.permission.CAMERA, Manifest.permission.ACCESS_FINE_LOCATION) {
-        Toast.makeText(this, "Camera and audio recording permissions granted", Toast.LENGTH_SHORT).show();
+//        Toast.makeText(this, "Camera and audio recording permissions granted", Toast.LENGTH_SHORT).show();
         // Do the stuff with permissions safely
 
     }
@@ -297,7 +303,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
 
                         .setNegativeButton(cancel, object : DialogInterface.OnClickListener {
-                             override fun onClick(dialog: DialogInterface, which: Int) {
+                            override fun onClick(dialog: DialogInterface, which: Int) {
                                 Toast.makeText(this@MainActivity, "Canceled Change Name", Toast.LENGTH_SHORT).show()
                             }
 
@@ -327,7 +333,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
                                     mFirebaseUser!!.updateProfile(profileUpdate)
                                             .addOnCompleteListener { task ->
-                                                 fun onComplete(@NonNull task: Task<Void>) {
+                                                fun onComplete(@NonNull task: Task<Void>) {
                                                     if (task.isSuccessful()) {
                                                         mUsername = mFirebaseUser!!.getDisplayName()
                                                         mUid = mFirebaseUser!!.getUid()
@@ -443,5 +449,29 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     override fun onFragmentInteraction(uri: Uri) {
         // For linking activities and fragment to prevent crash
         Log.d("onfragmentinteraction", "")
+    }
+
+    private fun showGPSAlert() {
+        val dialog = android.app.AlertDialog.Builder(this)
+        dialog.setTitle("Enable Location")
+                .setMessage("Your Locations Settings is set to 'Off'.\nPlease Enable Location to " + "use this APP")
+                .setPositiveButton("Location Settings") { paramDialogInterface, paramInt ->
+                    val myIntent = Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS)
+                    startActivity(myIntent)
+                }
+                .setNegativeButton("Cancel") { paramDialogInterface, paramInt -> }
+        dialog.show()
+    }
+
+    private val isLocationEnabled: Boolean
+        get() {
+            locationManager = getSystemService(Context.LOCATION_SERVICE) as LocationManager
+            return locationManager!!.isProviderEnabled(LocationManager.GPS_PROVIDER) || locationManager!!.isProviderEnabled(LocationManager.NETWORK_PROVIDER)
+        }
+
+    private fun checkLocation(): Boolean {
+        if (!isLocationEnabled)
+            showGPSAlert()
+        return isLocationEnabled
     }
 }
